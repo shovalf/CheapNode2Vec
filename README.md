@@ -10,4 +10,4 @@ Both files are well documented and assume familiarity with the problem and sugge
 In order to run both codes, one should get a graph in  '.edgelist' or 'txt' form and decide the number of nodes in the initial projection, and change both of them in the main function. 
 
 In order to check performance of the suggested method, one can run the 'GEM_visualization' file which commits a visualization task as explained in the survey file, and compare between regular node2vec and our method.
-To do that, you need a graph in the format explained above, and can also supply nodes' labels if you have.
+To do that, you need a graph in the format explained above, and can also supply nodes' labels if you have them.
