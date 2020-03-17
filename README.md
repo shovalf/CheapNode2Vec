@@ -11,3 +11,7 @@ In order to run both codes, one should get a graph in  '.edgelist' or 'txt' form
 
 In order to check performance of the suggested method, one can run the 'GEM_visualization' file which commits a visualization task as explained in the survey file, and compare between regular node2vec and our method.
 To do that, you need a graph in the format explained above, and can also supply nodes' labels if you have them.
+
+For example datasets, you can see labeled graphs in here: https://github.com/louzounlab/DataSets/tree/master/Graph/Node_Labeled_Grap.
+
+Notice that the minimum number of nodes requested is 10K.
