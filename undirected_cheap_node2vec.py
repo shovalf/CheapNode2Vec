@@ -248,45 +248,54 @@ def main():
     user_wish = True
     # if you want to see prints, do user_wish=True
     user_print("read the graph..", user_wish)
-    G = nx.read_edgelist("test.edgelist", create_using=nx.DiGraph())
+
+    # read the graph. here you can change to your own graph
+    G = nx.read_edgelist("pubmed2_edges.txt", create_using=nx.DiGraph(), delimiter=',')
+
     # if you have a graph with labels, you can input its name here
-    file = None
-    # get the initial projection by set and list to help us later
-    initial_proj_nodes = get_initial_proj_nodes(G, 0.95)
-    user_print("number of nodes in initial projection is: " + str(len(initial_proj_nodes)), user_wish)
-    n = G.number_of_nodes()
-    e = G.number_of_edges()
-    user_print("number of nodes in graph is: " + str(n), user_wish)
-    user_print("number of edges in graph is: " + str(e), user_wish)
-    # the nodes of our graph
-    G_nodes = list(G.nodes())
-    set_G_nodes = set(G_nodes)
-    set_proj_nodes = set(initial_proj_nodes)
-    G_edges = [list(i) for i in G.edges()]
-    user_print("make a sub graph of the embedding nodes, it will take a while...", user_wish)
-    # creating sub_G to do node2vec on it later
-    sub_G = create_sub_G(initial_proj_nodes, G)
-    user_print("calculate the projection of the sub graph with node2vec...", user_wish)
-    dict_projections = our_node2vec(sub_G, dim)
-    # convert the graph to undirected
-    H = G.to_undirected()
-    # from now count the time of our suggested algorithm
-    t = time.time()
-    neighbors_dict = create_dict_neighbors(H)
-    # making all lists to set (to help us later in the code)
-    set_nodes_no_proj = set_G_nodes - set_proj_nodes
-    list_set_nodes_no_proj = list(set_nodes_no_proj)
-    # create dicts of connections
-    dict_node_node, dict_node_enode, dict_enode_enode = create_dicts_of_connections(set_proj_nodes, set_nodes_no_proj,
-                                                                                    neighbors_dict)
-    # the final function to get the embeddings
-    final_dict_enode_proj, set_n_e = final_function(dict_projections, dict_node_enode, dict_node_node, dict_enode_enode, set_nodes_no_proj, 0.01, dim)
-    # to calculate running time
-    elapsed_time = time.time() - t
-    print("running time: ", elapsed_time)
-    print("The number of nodes that aren't in the final projection:", len(set_n_e))
-    print("The number of nodes that are in the final projection:", len(final_dict_enode_proj))
-    return final_dict_enode_proj, G, file
+    file = "pubmed2_tags.txt"
+    # choose number of nodes in initial projection. These value corresponds to 116 nodes
+    initial = [0.975]
+    list_dicts = []
+
+    for l in initial:
+        # get the initial projection by set and list to help us later
+        initial_proj_nodes = get_initial_proj_nodes(G, l)
+        user_print("number of nodes in initial projection is: " + str(len(initial_proj_nodes)), user_wish)
+        n = G.number_of_nodes()
+        e = G.number_of_edges()
+        user_print("number of nodes in graph is: " + str(n), user_wish)
+        user_print("number of edges in graph is: " + str(e), user_wish)
+        # the nodes of our graph
+        G_nodes = list(G.nodes())
+        set_G_nodes = set(G_nodes)
+        set_proj_nodes = set(initial_proj_nodes)
+        G_edges = [list(i) for i in G.edges()]
+        user_print("make a sub graph of the embedding nodes, it will take a while...", user_wish)
+        # creating sub_G to do node2vec on it later
+        sub_G = create_sub_G(initial_proj_nodes, G)
+        user_print("calculate the projection of the sub graph with node2vec...", user_wish)
+        dict_projections = our_node2vec(sub_G, dim)
+        # convert the graph to undirected
+        H = G.to_undirected()
+        # from now count the time of our suggested algorithm
+        t = time.time()
+        neighbors_dict = create_dict_neighbors(H)
+        # making all lists to set (to help us later in the code)
+        set_nodes_no_proj = set_G_nodes - set_proj_nodes
+        # create dicts of connections
+        dict_node_node, dict_node_enode, dict_enode_enode = create_dicts_of_connections(set_proj_nodes, set_nodes_no_proj,
+                                                                                        neighbors_dict)
+        # the final function to get the embeddings
+        final_dict_enode_proj, set_n_e = final_function(dict_projections, dict_node_enode, dict_node_node, dict_enode_enode, set_nodes_no_proj, 0.01, dim)
+        # to calculate running time
+        elapsed_time = time.time() - t
+        print("running time: ", elapsed_time)
+        print("The number of nodes that aren't in the final projection:", len(set_n_e))
+        print("The number of nodes that are in the final projection:", len(final_dict_enode_proj))
+        list_dicts.append(final_dict_enode_proj)
+
+    return list_dicts, G, file
 
 
-final_dict_proj, G, file = main()
+list_dicts, G, file = main()
