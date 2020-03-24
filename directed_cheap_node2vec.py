@@ -491,57 +491,64 @@ def main():
     user_print("read the graph..", user_wish)
 
     # read the graph, here you can change to your own graph
-    G = nx.read_edgelist("test.edgelist", create_using=nx.DiGraph(), delimiter=',')
+    G = nx.read_edgelist("pubmed2_edges.txt", create_using=nx.DiGraph(), delimiter=',')
     n = G.number_of_nodes()
     e = G.number_of_edges()
     print(n, e)
 
     # if you have a graph with labels, you can input its name here
-    file = None
+    file = "pubmed2_tags.txt"
 
-    # get the initial projection, number of nodes can be changed, see documentation of the function above
-    initial_proj_nodes = get_initial_proj_nodes(G, 0.97)
-    print(len(initial_proj_nodes))
-    user_print("number of nodes in initial projection is: " + str(len(initial_proj_nodes)), user_wish)
-    n = G.number_of_nodes()
-    e = G.number_of_edges()
-    user_print("number of nodes in graph is: " + str(n), user_wish)
-    user_print("number of edges in graph is: " + str(e), user_wish)
-    # the nodes of our graph
-    G_nodes = list(G.nodes())
-    set_G_nodes = set(G_nodes)
-    set_proj_nodes = set(initial_proj_nodes)
-    G_edges = [list(i) for i in G.edges()]
-    user_print("make a sub graph of the embedding nodes, it will take a while...", user_wish)
-    # creating sub_G to do node2vec on it later
-    sub_G = create_sub_G(initial_proj_nodes, G)
-    user_print("calculate the projection of the sub graph with node2vec...", user_wish)
-    # create dictionary of nodes and their projections after running node2vec on the sub graph
-    dict_projections = our_node2vec(sub_G, dim)
-    # from now count the time of our suggested algorithm
-    t = time.time()
-    neighbors_dict = create_dict_neighbors(G)
-    set_nodes_no_proj = set_G_nodes - set_proj_nodes
-    list_set_nodes_no_proj = list(set_nodes_no_proj)
-    # create dicts of connections
-    dict_node_node_in, dict_node_node_out, dict_node_enode, dict_enode_node, dict_enode_enode_in, dict_enode_enode_out\
-        = create_dicts_of_connections(set_proj_nodes, set_nodes_no_proj, neighbors_dict, G)
-    # calculate best parameters for the final projection calculation
-    params_estimate_dict, labeled_nodes = crate_data_for_linear_regression(initial_proj_nodes, dict_projections, dict_enode_enode_in,
-                                     dict_enode_enode_out, dim)
-    pre_params, score = linear_regression(params_estimate_dict, labeled_nodes, dict_projections)
-    print(pre_params, score)
-    # create the final dictionary of nodes and their dictionaries
-    final_dict_projections, set_no_proj = final_function(pre_params, dict_projections,
-                                                    dict_node_enode, dict_enode_node, dict_node_node_out,
-                                                    dict_node_node_in, dict_enode_enode_out,
-                                                    dict_enode_enode_in, set_nodes_no_proj, 0.01, dim)
-    # to calculate running time
-    elapsed_time = time.time() - t
-    print("running time: ", elapsed_time)
-    print("The number of nodes that aren't in the final projection:", len(set_no_proj))
-    print("The number of nodes that are in the final projection:", len(final_dict_projections))
-    return final_dict_projections, G, file
+    # choose number of nodes in initial projection. These values correspond to [100,1000,3000,7000,10000]
+    initial = [0.975, 0.905, 0.715, 0.447, 0.339]
+    list_dicts = []
+
+    for l in initial:
+        # get the initial projection, number of nodes can be changed, see documentation of the function above
+        initial_proj_nodes = get_initial_proj_nodes(G, l)
+        print(len(initial_proj_nodes))
+        user_print("number of nodes in initial projection is: " + str(len(initial_proj_nodes)), user_wish)
+        n = G.number_of_nodes()
+        e = G.number_of_edges()
+        user_print("number of nodes in graph is: " + str(n), user_wish)
+        user_print("number of edges in graph is: " + str(e), user_wish)
+        # the nodes of our graph
+        G_nodes = list(G.nodes())
+        set_G_nodes = set(G_nodes)
+        set_proj_nodes = set(initial_proj_nodes)
+        G_edges = [list(i) for i in G.edges()]
+        user_print("make a sub graph of the embedding nodes, it will take a while...", user_wish)
+        # creating sub_G to do node2vec on it later
+        sub_G = create_sub_G(initial_proj_nodes, G)
+        user_print("calculate the projection of the sub graph with node2vec...", user_wish)
+        # create dictionary of nodes and their projections after running node2vec on the sub graph
+        dict_projections = our_node2vec(sub_G, dim)
+        # from now count the time of our suggested algorithm
+        t = time.time()
+        neighbors_dict = create_dict_neighbors(G)
+        set_nodes_no_proj = set_G_nodes - set_proj_nodes
+        list_set_nodes_no_proj = list(set_nodes_no_proj)
+        # create dicts of connections
+        dict_node_node_in, dict_node_node_out, dict_node_enode, dict_enode_node, dict_enode_enode_in, dict_enode_enode_out\
+            = create_dicts_of_connections(set_proj_nodes, set_nodes_no_proj, neighbors_dict, G)
+        # calculate best parameters for the final projection calculation
+        params_estimate_dict, labeled_nodes = crate_data_for_linear_regression(initial_proj_nodes, dict_projections, dict_enode_enode_in,
+                                         dict_enode_enode_out, dim)
+        pre_params, score = linear_regression(params_estimate_dict, labeled_nodes, dict_projections)
+        print(pre_params, score)
+        # create the final dictionary of nodes and their dictionaries
+        final_dict_projections, set_no_proj = final_function(pre_params, dict_projections,
+                                                        dict_node_enode, dict_enode_node, dict_node_node_out,
+                                                        dict_node_node_in, dict_enode_enode_out,
+                                                        dict_enode_enode_in, set_nodes_no_proj, 0.01, dim)
+        # to calculate running time
+        elapsed_time = time.time() - t
+        print("running time: ", elapsed_time)
+        print("The number of nodes that aren't in the final projection:", len(set_no_proj))
+        print("The number of nodes that are in the final projection:", len(final_dict_projections))
+        list_dicts.append(final_dict_projections)
+
+    return list_dicts, G, file
 
 
-final_dict_proj, G, file = main()
+list_dicts, G, file = main()
