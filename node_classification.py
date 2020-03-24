@@ -4,19 +4,21 @@ Full explanation for what is done is in the survey file in our github page.
 Code explanation:
 For this task, one should have a labeled graph: 2 files are required: Graph edges in '.edgelist' or '.txt' format and
 nodes' labels in '.txt' format. For example labeled graphs you can enter to the link in the github page. You should
-insert the in the appropriate place in the main function in the file 'directed_node2vec'.
+insert the in the appropriate place in the main function in the file 'directed_cheap_node2vec' or
+'undirected_cheap_node2vec', depends on your graph's type.
 This task compares two things:
 1. Compare performance of our method and regular node2vec, meaning we do the same task with both methods, calculate
     needed scores and compare between them - This would be mission 1.
 2. Only for our method, compare the success of the task (measuring by several scores) for different number of nodes
     in the initial projection - This would be mission 2.
-For mission 1: Go to the file 'directed_cheap_node2vec'. In the main function change 'initial' variable to a list
-    that consists the percentage of nodes you want in the initial projection (for example, for pubmed2, 0.975 means 100
-    nodes in the initial projection). Go back to this file and run main(1).
-For mission 2: Go to the file 'directed_cheap_node2vec'. In the main function, change 'initial' variable to a list
-    that consists a number of percentages of nodes you want in the initial projection (for example, for pubmed2
-    the list is [0.975, 0.905, 0.715, 0.447, 0.339], meaning run with 100 nodes in the initial projection, then
-    with 1000, 3000, 7000 and 10000). Go back to this file and run main(2).
+For mission 1: Go to the file 'directed_cheap_node2vec' (or undirected). In the main function change 'initial' variable
+    to a list that consists the percentage of nodes you want in the initial projection (for example, for pubmed2, 0.975
+    means 100 nodes in the initial projection). Go back to this file and run main(1, 'directed'/'undirected').
+For mission 2: Go to the file 'directed_cheap_node2vec' (or undirected). In the main function, change 'initial' variable
+    to a list that consists a number of percentages of nodes you want in the initial projection (for example, for
+    pubmed2 the list is [0.975, 0.905, 0.715, 0.447, 0.339], meaning run with 100 nodes in the initial projection, then
+    with 1000, 3000, 7000 and 10000). Go back to this file to the function 'initial_proj_vs_scores' and replace x
+    to be equal to 'initial' list you changed earlier. Then, you can run this file- main(2, 'directed'/'undirected'.
 """
 
 
@@ -28,7 +30,6 @@ from sklearn.linear_model import LogisticRegression as lr
 # from sklearn.svm import LinearSVC
 from sklearn.metrics import f1_score, accuracy_score
 import numpy as np
-from directed_cheap_node2vec import list_dicts, G, file
 from node2vec import Node2Vec
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -177,7 +178,7 @@ def split_vs_score(avg_micro1, avg_macro1, avg_micro2, avg_macro2, avg_acc1, avg
     """
     For every type of score plot the graph as explained above.
     """
-    # micro graph
+    # you can change borders as you like
     fig1 = do_graph_split(avg_micro1, avg_micro2, test_ratio_arr, 0.4, 0.2, "micro-F1 score", 1)
     fig2 = do_graph_split(avg_macro1, avg_macro2, test_ratio_arr, 0.5, 0, "macro-F1 score", 2)
     fig3 = do_graph_split(avg_acc1, avg_acc2, test_ratio_arr, 0.6, 0, "accuracy",3)
@@ -207,10 +208,11 @@ def do_graph_initial(score1, score2, number_of_nodes, bottom, top, score):
 
 
 def initial_proj_vs_scores(micro1, micro2, macro1, macro2, acc1, acc2):
+    # change x according to 'initial' list in the other file as explained in the begining og this file.
     x = [100, 1000, 3000, 7000, 10000]
-    do_graph_initial(micro1, micro2, x, 0, 0.6, "micro-F1 score")
-    do_graph_initial(macro1, macro2, x, 0, 0.6, "macro-F1 score")
-    do_graph_initial(acc1, acc2, x, 0, 0.6, "accuracy")
+    do_graph_initial(micro1, micro2, x, 0, 1, "micro-F1 score")
+    do_graph_initial(macro1, macro2, x, 0, 1, "macro-F1 score")
+    do_graph_initial(acc1, acc2, x, 0, 1, "accuracy")
 
 
 def read_labels(file_tags, dict_proj):
@@ -267,7 +269,16 @@ def regular_node2vec(graph, dim, dict_proj):
     return X
 
 
-def main(mission):
+def main(mission, graph_type):
+    """
+    The main function running the 2 missions that were explained above. If you have a directed graph please initialize
+    graph_type = 'directed'. If you have an undirected graph- graph_type = 'undirected'. For mission 1 insert
+    mission = 1, for mission 2 insert mission = 2.
+    """
+    if graph_type == 'directed':
+        from directed_cheap_node2vec import list_dicts, G, file
+    elif graph_type == 'undirected':
+        from undirected_cheap_node2vec import list_dicts, G, file
     if file is not None:
         all_micro1 = []
         all_micro2 = []
@@ -302,4 +313,5 @@ def main(mission):
             initial_proj_vs_scores(all_micro1, all_micro2, all_macro1, all_macro2, all_acc1, all_acc2)
 
 
-main(2)
+# here you can change for type of graph you have (directed or undirected) and mission you want
+main(1, 'directed')
