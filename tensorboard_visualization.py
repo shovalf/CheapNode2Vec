@@ -33,7 +33,34 @@ def log_tensorboard(embedding_vectors, embedding_name,log_dir, metadata=None):
     saver.save(sess=None, global_step=0, save_path=log_dir)
 
 
-# test with random mbeddings :
+'''
+using example:
+1. load graph 
+2. run cheap node2vec 
+3. save nodes vectors (and optionaly labels) to tensorboard logs 
+'''
+
+from directed_cheap_node2vec import main
+
+log_dir = r'./tensorboard/'
+
+
 if __name__ == '__main__':
-    embedding_vectors = np.random.rand(1000,100)
-    log_tensorboard(embedding_vectors,'RandomProjection','./tensorboard/')
+
+    list_dicts, G, file = main()
+    dict_proj = list_dicts[0]
+
+    # load labels file
+    with open(file) as f:
+        labels_list = [label.split() for label in f]
+
+    # create labels list in nodes order :
+    labels_dict = {label[0]:label[1] for label in labels_list}
+    labels = [labels_dict[node] for node in dict_proj.keys()]
+
+    projections_cheap = [dict_proj[key] for key in dict_proj.keys()]
+    log_tensorboard(projections_cheap, 'projections_cheap', log_dir=log_dir, metadata=labels)
+
+    print('for visualization run:')
+    print(f'tensorboard --logdir {log_dir}')
+
