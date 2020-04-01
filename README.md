@@ -14,7 +14,7 @@ In order to check performance of the suggested method, we have some evaluation t
 1. Visualization task: 'visualization.py' file which commits a visualization task as explained in the survey file, and compare between regular node2vec and our method.
 To do that, you need a graph in the format explained above, and can also supply nodes' labels if you have them.
 
-2. Another Visualization Task: ""
+2. Another Visualization Task: 'tensorbroad_visualization.py'
 
 3. Node Classification task: 'node_classification.py' file which commits a node classification task as explained in the survey file, and compare performance of regular node2vec vs our method, and also compare between different number of nodes in the initial projection. In 'node_classification' file there is a full explanation of what is needed for the task and how to run it.
 
