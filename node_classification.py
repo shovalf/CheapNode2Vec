@@ -1,13 +1,13 @@
 """
 Node classification Task For Evaluation:
-Full explanation for what is done is in the survey file in our github page.
+Full explanation for what is done can be found the survey file in our github page.
 Code explanation:
 For this task, one should have a labeled graph: 2 files are required: Graph edges in '.edgelist' or '.txt' format and
-nodes' labels in '.txt' format. For example labeled graphs you can enter to the link in the github page. You should
-insert the in the appropriate place in the main function in the file 'directed_cheap_node2vec' or
+nodes' labels in '.txt' format. For labeled graphs examples you can enter the link in the github page. You should
+insert them in the appropriate place in the main function in the file 'directed_cheap_node2vec' or
 'undirected_cheap_node2vec', depends on your graph's type.
 This task compares two things:
-1. Compare performance of our method and regular node2vec, meaning we do the same task with both methods, calculate
+1. Compare performance of our method and regular node2vec, i.e. we do the same task with both methods, calculate
     needed scores and compare between them - This would be mission 1.
 2. Only for our method, compare the success of the task (measuring by several scores) for different number of nodes
     in the initial projection - This would be mission 2.
